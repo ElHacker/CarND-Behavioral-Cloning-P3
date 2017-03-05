@@ -55,16 +55,28 @@ def generator(samples, batch_size=32):
             angles = []
 
             for batch_sample in batch_samples:
-                source_path = batch_sample[0]
-                img_path = './data/' + source_path
-                image = cv2.imread(img_path)
-                center_angle = float(batch_sample[3])
-                images.append(image)
-                angles.append(center_angle)
+                # Use images from center, left and right cameras.
+                for i in range(3):
+                    source_path = batch_sample[i].split('/')[-1]
+                    img_path = './data/IMG/' + source_path
+                    image = cv2.imread(img_path)
+                    images.append(image)
+
+                # create adjusted steering measurements for the side camera images.
+                correction = 0.2 # this is a parameter to adjust.
+                steering_center = float(batch_sample[3])
+                # We add correction to the left because we want it to be closer to center
+                # we substract correction from the right because of the same.
+                steering_left = steering_center + correction
+                steering_right = steering_center - correction
+                angles.append(steering_center)
+                angles.append(steering_left)
+                angles.append(steering_right)
+
             images, angles = augment_data(images, angles)
-            X_train = np.array(images)
-            y_train = np.array(angles)
-            yield sklearn.utils.shuffle(X_train, y_train)
+            x = np.array(images)
+            y = np.array(angles)
+            yield sklearn.utils.shuffle(x, y)
 
 def augment_data(images, angles):
     augmented_images, augmented_angles = [], []
@@ -83,7 +95,6 @@ validation_generator = generator(validation_samples, batch_size=batch_size)
 
 # Image format.
 row, col, ch = 160, 320, 3
-
 
 # LeNet
 model = Sequential()
