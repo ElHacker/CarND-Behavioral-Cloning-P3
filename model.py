@@ -89,7 +89,7 @@ def augment_data(images, angles):
     return (augmented_images, augmented_angles)
 
 batch_size = 32
-epochs = 3
+epochs = 5
 train_generator = generator(train_samples, batch_size=batch_size)
 validation_generator = generator(validation_samples, batch_size=batch_size)
 
