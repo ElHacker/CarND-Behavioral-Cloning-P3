@@ -11,38 +11,10 @@ from sklearn.model_selection import train_test_split
 samples = []
 with open('./data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
-    for i, line in enumerate(reader):
-        # skip the columns titles.
-        if (i == 0):
-            continue
+    for line in reader:
         samples.append(line)
 
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
-
-"""
-images = []
-measurements = []
-for i, line in enumerate(lines):
-    if (i == 0):
-        continue
-
-    # read in the images from center, left, right
-    for j in range(3):
-        source_path = line[j]
-        img_path = './data/' + source_path
-        image = cv2.imread(img_path)
-        images.append(image)
-
-    # create adjusted steering measurements for the side camera images.
-    correction = 0.2 # this is a parameter to adjust.
-    steering_center = float(line[3])
-    # We add correction to the left because we want it to be closer to center
-    # we substract correction from the right because of the same.
-    steering_left = steering_center + correction
-    steering_right = steering_center - correction
-    measurements.extend([steering_center, steering_left, steering_right])
-
-"""
 
 def generator(samples, batch_size=32):
     num_samples = len(samples)
@@ -96,7 +68,7 @@ validation_generator = generator(validation_samples, batch_size=batch_size)
 # Image format.
 row, col, ch = 160, 320, 3
 
-# LeNet
+# Nvidia's Implementation
 model = Sequential()
 model.add(
         Lambda(
